@@ -26,8 +26,11 @@ export class CustomerController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
-    return this.customerService.update(+id, updateCustomerDto);
+  update(@Param('id') id: string, @Body() updateCustomerDto: Prisma.customerUpdateInput) {
+    return this.customerService.update({
+      where:{id:id},
+      data :updateCustomerDto
+    });
   }
 
   @Delete(':id')

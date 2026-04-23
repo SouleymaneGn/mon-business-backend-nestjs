@@ -35,8 +35,20 @@ export class CustomerService {
     return `This action returns a #${id} customer`;
   }
 
-  update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    return `This action updates a #${id} customer`;
+  update(params:{
+    where:Prisma.customerWhereUniqueInput;
+    data : Prisma.customerUpdateInput
+  }) {
+    try {
+      const {where, data} = params
+    return this.prismaService.customer.update({
+      data,
+      where
+    })
+    } catch (error) {
+         throw new InternalServerErrorException('Erreur lors de la mise à jour du client');
+ 
+    }
   }
 
   remove(id: number) {
