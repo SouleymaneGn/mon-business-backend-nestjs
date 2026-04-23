@@ -21,8 +21,14 @@ export class CustomerService {
    
   }
 
-  findAll() {
-    return `This action returns all customer`;
+  async findAll() {
+    try {
+      const customer = await this.prismaService.customer.findMany()
+      return customer
+    } catch (error) {
+      throw new InternalServerErrorException('Erreur lors de la recuperation des clients');
+   
+    }
   }
 
   findOne(id: number) {

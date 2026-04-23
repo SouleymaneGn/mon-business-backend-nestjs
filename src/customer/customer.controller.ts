@@ -15,6 +15,7 @@ export class CustomerController {
   }
 
   @Get()
+  @HttpCode(200)
   findAll() {
     return this.customerService.findAll();
   }
