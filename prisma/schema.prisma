@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum TransactionType {
+  DEPOT
+  RETRAIT
+  ACHAT
+}
+model customer {
+  id        String        @id @default(uuid())
+  name      String
+  phone     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String          @id @default(uuid())
+
+  clientId  String
+  customer    customer          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  type      TransactionType
+  amount    Float
+  note      String?
+
+  createdAt DateTime        @default(now())
+  updatedAt DateTime      @updatedAt
+
+}
