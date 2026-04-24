@@ -62,8 +62,9 @@ async create(data: Prisma.TransactionCreateInput) {
   return transaction;
 }
 
-  findAll() {
-    return `This action returns all transaction`;
+  async findAll() {
+    const transaction = await this.prismaService.transaction.findMany()
+    return transaction
   }
 
   findOne(id: number) {
