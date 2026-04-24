@@ -1,7 +1,14 @@
+import { ApiProperty } from "@nestjs/swagger"
+
 export class CreateCustomerDto {
-id?:string
-name!:string 
+id?:string;
+@ApiProperty()
+name!:string ;
+@ApiProperty()
 phone!:string
 createdAt?:Date
 updateAt?:Date
 }
+
+
+
