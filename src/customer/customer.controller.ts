@@ -10,7 +10,7 @@ export class CustomerController {
 
   @Post()
   @HttpCode(201)
-  create(@Body() createCustomerDto: Prisma.customerCreateInput ) {
+  create(@Body() createCustomerDto: CreateCustomerDto ) {
     return this.customerService.create(createCustomerDto);
   }
 
@@ -26,7 +26,7 @@ export class CustomerController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCustomerDto: Prisma.customerUpdateInput) {
+  update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
     return this.customerService.update({
       where:{id:id},
       data :updateCustomerDto

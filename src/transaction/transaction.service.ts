@@ -63,7 +63,15 @@ async create(data: Prisma.TransactionCreateInput) {
 }
 
   async findAll() {
-    const transaction = await this.prismaService.transaction.findMany()
+    const transaction = await this.prismaService.transaction.findMany({
+      include:{
+        customer:{
+          select:{
+            name:true
+          }
+        }
+      }
+    })
     return transaction
   }
 

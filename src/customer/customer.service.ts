@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 @Injectable()
 export class CustomerService {
   constructor(private readonly prismaService : PrismaService){}
-  async create(createCustomerDto: Prisma.customerCreateInput) {
+  async create(createCustomerDto: CreateCustomerDto) {
     try {
     const customer = await this.prismaService.customer.create({data: createCustomerDto})
     return {
