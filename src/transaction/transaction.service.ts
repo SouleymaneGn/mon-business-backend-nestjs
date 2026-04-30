@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionDto } from './dto/client-transation.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
@@ -62,18 +63,19 @@ async create(data: Prisma.TransactionCreateInput) {
   return transaction;
 }
 
-  async findAll() {
-    const transaction = await this.prismaService.transaction.findMany({
-      include:{
-        customer:{
-          select:{
-            name:true
-          }
-        }
-      }
-    })
-    return transaction
-  }
+async findAll(): Promise<TransactionDto[]> {
+  const transactions = await this.prismaService.transaction.findMany({
+    include: {
+      customer: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  return transactions.map(TransactionDto.fromPrisma);
+}
 
   findOne(id: number) {
     return `This action returns a #${id} transaction`;

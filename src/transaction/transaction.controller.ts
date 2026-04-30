@@ -3,6 +3,8 @@ import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Prisma } from '@prisma/client';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { TransactionResponseDto } from './dto/Transaction-response.dto';
 
 @Controller('transaction')
 export class TransactionController {
@@ -14,6 +16,8 @@ export class TransactionController {
   }
 
   @Get()
+  @ApiOkResponse({ type: TransactionResponseDto, isArray: true })
+
   findAll() {
     return this.transactionService.findAll();
   }
