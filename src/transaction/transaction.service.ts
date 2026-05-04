@@ -2,21 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionDto } from './dto/client-transation.dto';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { TransactionType } from '@prisma/client';
 
 @Injectable()
 export class TransactionService {
   constructor(private readonly prismaService: PrismaService){}
-async create(data: Prisma.TransactionCreateInput) {
-  const { customer, type, amount } = data;
-
-  // récupérer clientId depuis relation nested
-  const clientId = customer.connect?.id;
-
-  if (!clientId) {
-    throw new BadRequestException('Client requis');
-  }
+async create(dto: CreateTransactionDto) {
+  const { clientId, type, amount } = dto;
 
   // 1. Vérifier client
   const client = await this.prismaService.customer.findUnique({
@@ -27,18 +20,7 @@ async create(data: Prisma.TransactionCreateInput) {
     throw new BadRequestException('Client introuvable');
   }
 
-  // 2. Créer transaction
-  const transaction = await this.prismaService.transaction.create({
-    data: {
-      type,
-      amount,
-      customer: {
-        connect: { id: clientId },
-      },
-    },
-  });
-
-  // 3. Calcul solde
+  // 2. Calcul solde AVANT création
   let newSolde = client.solde;
 
   switch (type) {
@@ -47,20 +29,37 @@ async create(data: Prisma.TransactionCreateInput) {
       break;
 
     case 'RETRAIT':
-          newSolde -= amount;
-      break;
     case 'ACHAT':
       newSolde -= amount;
       break;
+
+    default:
+      throw new BadRequestException('Type de transaction invalide');
   }
 
-  // 4. Update client
-  await this.prismaService.customer.update({
-    where: { id: clientId },
-    data: { solde: newSolde },
+  if (newSolde < 0) {
+    throw new BadRequestException('Solde insuffisant');
+  }
+
+  // 3. Transaction atomique (TRÈS IMPORTANT)
+  const result = await this.prismaService.$transaction(async (tx) => {
+    const transaction = await tx.transaction.create({
+      data: {
+        clientId,
+        type,
+        amount,
+      },
+    });
+
+    await tx.customer.update({
+      where: { id: clientId },
+      data: { solde: newSolde },
+    });
+
+    return transaction;
   });
 
-  return transaction;
+  return result;
 }
 
 async findAll(): Promise<TransactionDto[]> {

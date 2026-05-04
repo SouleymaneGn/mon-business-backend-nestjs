@@ -11,7 +11,7 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post()
-  create(@Body() data: Prisma.TransactionCreateInput) {
+  create(@Body() data: CreateTransactionDto) {
     return this.transactionService.create(data);
   }
 
