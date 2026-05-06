@@ -16,6 +16,13 @@ enum TransactionType {
   RETRAIT
   ACHAT
 }
+enum InvoiceStatus {
+  BROUILLON   // facture en cours de création
+  EN_ATTENTE  // créée mais pas encore payée
+  PARTIEL     // avance
+  PAYE        // totalement payé
+  ANNULE      // annulée
+}
 model customer {
   id        String        @id @default(uuid())
   name      String
@@ -24,10 +31,12 @@ model customer {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   
-  transactions Transaction[]
+  transactions transaction[]
+
+  invoices invoice[]
 }
 
-model Transaction {
+model transaction {
   id        String          @id @default(uuid())
 
   clientId  String
@@ -40,4 +49,38 @@ model Transaction {
   createdAt DateTime        @default(now())
   updatedAt DateTime      @updatedAt
 
+}
+
+model produit {
+  id        String   @id @default(uuid())
+  name      String
+  price     Float
+  stock     Int      @default(0)
+
+  invoiceItems InvoiceItem[]
+}
+model invoice {
+  id          String   @id @default(uuid())
+  customerId  String
+  customer    customer @relation(fields: [customerId], references: [id])
+
+  total       Float    @default(0)
+  status      InvoiceStatus @default(BROUILLON)
+
+  items       InvoiceItem[]
+
+  createdAt   DateTime @default(now())
+}
+
+model InvoiceItem {
+  id         String   @id @default(uuid())
+
+  invoiceId  String
+  invoice    invoice  @relation(fields: [invoiceId], references: [id])
+
+  productId  String
+  product    produit  @relation(fields: [productId], references: [id])
+
+  quantity   Int
+  price      Float
 }
