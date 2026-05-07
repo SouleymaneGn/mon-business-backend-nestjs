@@ -15,6 +15,8 @@ enum TransactionType {
   DEPOT
   RETRAIT
   ACHAT
+  PAIEMENT
+  AJUSTEMENT
 }
 enum InvoiceStatus {
   BROUILLON   // facture en cours de création
@@ -22,6 +24,12 @@ enum InvoiceStatus {
   PARTIEL     // avance
   PAYE        // totalement payé
   ANNULE      // annulée
+}
+enum PaymentMethod {
+  CASH
+  ORANGE_MONEY
+  MOBILE_MONEY
+  VIREMENT
 }
 model customer {
   id        String        @id @default(uuid())
@@ -34,6 +42,8 @@ model customer {
   transactions transaction[]
 
   invoices invoice[]
+  payments      Payment[]
+
 }
 
 model transaction {
@@ -68,6 +78,8 @@ model invoice {
   status      InvoiceStatus @default(BROUILLON)
 
   items       InvoiceItem[]
+  payments      Payment[]
+
 
   createdAt   DateTime @default(now())
 }
@@ -83,4 +95,21 @@ model InvoiceItem {
 
   quantity   Int
   price      Float
+}
+model Payment  {
+  id            String   @id @default(uuid())
+    customerId    String
+  customer      customer @relation(fields: [customerId], references: [id])
+
+  invoiceId     String?
+  invoice       invoice ? @relation(fields: [invoiceId], references: [id])
+
+  amount        Float
+
+  method        PaymentMethod
+
+  note          String?
+
+  createdAt     DateTime @default(now())
+
 }

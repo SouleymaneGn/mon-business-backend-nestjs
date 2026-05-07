@@ -32,7 +32,7 @@ async create(createProductDto: CreateProdutDto) {
 
   async findAll() {
    const products = await this.prismaService.produit.findMany() 
-    return CreateProdutDto.fromPrisma(products)
+    return products.map(product => CreateProdutDto.fromPrisma(product))
   }
 
   findOne(id: number) {
