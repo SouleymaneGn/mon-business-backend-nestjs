@@ -56,18 +56,18 @@ export class PaymentsService {
     (sum, payment) => sum + payment.amount,
     0
   );
-
   // =========================================
   // 4. reste à payer
   // =========================================
 
-  const remaining = invoice.total - totalPaid;
+  const remainingAmount = invoice.total - totalPaid;
+
 
   // =========================================
   // 5. vérifier montant
   // =========================================
 
-  if (amount > remaining) {
+  if (amount > remainingAmount) {
     throw new BadRequestException(
       'Le paiement dépasse le reste à payer'
     );
@@ -146,15 +146,17 @@ export class PaymentsService {
     // =========================================
     // 10. update facture
     // =========================================
-
-    await tx.invoice.update({
-      where: {
-        id: invoiceId,
-      },
-      data: {
-        status: newStatus,
-      },
-    });
+ const newRemainingAmount = invoice.total - newPaidAmount;
+  await tx.invoice.update({
+  where: {
+    id: invoiceId,
+  },
+  data: {
+    status: newStatus,
+    paidAmount: newPaidAmount,
+    remainingAmount: newRemainingAmount,
+  },
+});
 
     return payment;
   });

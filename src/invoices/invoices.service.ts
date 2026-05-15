@@ -98,8 +98,9 @@ const { customerId, items } = dto;
     }
 
   findAll() {
-    return `This action returns all invoices`;
+    return this.prismaService.invoice.findMany()
   }
+
 
   findOne(id: number) {
     return `This action returns a #${id} invoice`;

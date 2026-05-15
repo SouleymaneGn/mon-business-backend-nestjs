@@ -76,6 +76,8 @@ model invoice {
 
   total       Float    @default(0)
   status      InvoiceStatus @default(BROUILLON)
+  paidAmount Float @default(0)
+  remainingAmount Float @default(0)
 
   items       InvoiceItem[]
   payments      Payment[]

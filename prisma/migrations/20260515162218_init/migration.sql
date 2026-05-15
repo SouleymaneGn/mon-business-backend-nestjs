@@ -34,6 +34,8 @@ CREATE TABLE "invoice" (
     "customerId" TEXT NOT NULL,
     "total" REAL NOT NULL DEFAULT 0,
     "status" TEXT NOT NULL DEFAULT 'BROUILLON',
+    "paidAmount" REAL NOT NULL DEFAULT 0,
+    "remainingAmount" REAL NOT NULL DEFAULT 0,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "invoice_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "customer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
