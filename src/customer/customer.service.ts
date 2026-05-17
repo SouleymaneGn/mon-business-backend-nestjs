@@ -26,6 +26,8 @@ export class CustomerService {
       const customer = await this.prismaService.customer.findMany()
       return customer
     } catch (error) {
+          console.log(error); // IMPORTANT
+
       throw new InternalServerErrorException('Erreur lors de la recuperation des clients');
    
     }
