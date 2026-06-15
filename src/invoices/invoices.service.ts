@@ -98,7 +98,11 @@ const { customerId, items } = dto;
     }
 
   findAll() {
-    return this.prismaService.invoice.findMany()
+    return this.prismaService.invoice.findMany({
+      include:{
+        customer:true
+      }
+    })
   }
 
 
