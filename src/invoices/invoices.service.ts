@@ -102,8 +102,23 @@ const { customerId, items } = dto;
   }
 
 
-  findOne(id: number) {
-    return `This action returns a #${id} invoice`;
+ async findOne(id: string) {
+const invoice = await this.prismaService.invoice.findUnique({
+    where: { id:id },
+    include: {
+      customer: true,
+      items: {
+        include: {
+          product: true
+        }
+      }
+    }
+  });
+
+  if (!invoice) {
+    throw new NotFoundException('Facture introuvable');
+  }
+  return invoice
   }
 
   update(id: number, updateInvoiceDto: UpdateInvoiceDto) {
