@@ -6,7 +6,9 @@ import { PrismaService } from 'src/prisma.service';
 @Injectable()
 export class InvoicesService {
   constructor(private prismaService : PrismaService){}
+  private purchase_price : number = 0
   async create(dto: CreateInvoiceDto) {
+
 const { customerId, items } = dto;
 
     // 1. vérifier client
@@ -36,7 +38,7 @@ const { customerId, items } = dto;
 
       // 4. parcourir produits
       for (const item of items) {
-
+        
         // chercher produit
         const product = await tx.produit.findUnique({
           where: {
@@ -56,7 +58,7 @@ const { customerId, items } = dto;
         }
 
         // calcul total ligne
-        const lineTotal = product.price * item.quantity;
+        const lineTotal = item.price * item.quantity;
 
         // ajouter total facture
         total += lineTotal;

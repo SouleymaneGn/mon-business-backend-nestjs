@@ -65,6 +65,7 @@ model produit {
   id        String   @id @default(uuid())
   name      String
   price     Float
+  purchase_price Float?
   stock     Int      @default(0)
 
   invoiceItems InvoiceItem[]
