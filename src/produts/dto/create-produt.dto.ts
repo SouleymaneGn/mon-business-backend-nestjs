@@ -6,10 +6,10 @@ export class CreateProdutDto {
   @ApiProperty()
   name!: string;
   @ApiProperty()
-
+  purchasePrice!:number
+  @ApiProperty()
   price!: number;
   @ApiProperty()
-
   stock!: number;
 
   static fromPrisma(data: any) : CreateProdutDto {

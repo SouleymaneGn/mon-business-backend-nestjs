@@ -31,6 +31,11 @@ enum PaymentMethod {
   MOBILE_MONEY
   VIREMENT
 }
+enum PurchaseStatus {
+  UNPAID
+  PARTIAL
+  PAID
+}
 model customer {
   id        String        @id @default(uuid())
   name      String
@@ -65,10 +70,12 @@ model produit {
   id        String   @id @default(uuid())
   name      String
   price     Float
-  purchase_price Float?
+  purchasePrice Float?
   stock     Int      @default(0)
 
   invoiceItems InvoiceItem[]
+    purchaseItems PurchaseItem[]
+
 }
 model invoice {
   id          String   @id @default(uuid())
@@ -116,3 +123,39 @@ model Payment  {
   createdAt     DateTime @default(now())
 
 }
+model Purchase {
+  id            String   @id @default(uuid())
+  supplierId    String
+  totalAmount   Float
+  paidAmount    Float    @default(0)
+  status        PurchaseStatus
+
+  supplier      Supplier @relation(fields: [supplierId], references: [id])
+
+  items         PurchaseItem[]
+
+  createdAt     DateTime @default(now())
+}
+model Supplier {
+  id          String   @id @default(uuid())
+  name        String
+  phone       String?
+  email       String?
+  address     String?
+  createdAt   DateTime @default(now())
+
+  purchases   Purchase[]
+}
+model PurchaseItem {
+  id            String   @id @default(uuid())
+
+  purchaseId    String
+  productId     String
+
+  quantity      Int
+  purchasePrice Float
+
+  purchase      Purchase @relation(fields: [purchaseId], references: [id])
+  produit       produit  @relation(fields: [productId], references: [id])
+}
+
