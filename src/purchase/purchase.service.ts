@@ -1,12 +1,65 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
+import { PurchaseStatus } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class PurchaseService {
-  create(createPurchaseDto: CreatePurchaseDto) {
-    return 'This action adds a new purchase';
-  }
+  constructor(private prisma: PrismaService){}
+async create(dto: CreatePurchaseDto) {
+  return this.prisma.$transaction(async (tx) => {
+
+    const totalAmount = dto.items.reduce(
+      (sum, item) => sum + item.quantity * item.purchasePrice,
+      0,
+    );
+
+    let status: PurchaseStatus;
+
+    if (dto.paidAmount === 0) {
+      status = PurchaseStatus.UNPAID;
+    } else if (dto.paidAmount >= totalAmount) {
+      status = PurchaseStatus.PAID;
+    } else {
+      status = PurchaseStatus.PARTIAL;
+    }
+
+    const purchase = await tx.purchase.create({
+      data: {
+        supplierId: dto.supplierId,
+        totalAmount,
+        paidAmount: dto.paidAmount,
+        status,
+      },
+    });
+
+    for (const item of dto.items) {
+
+      await tx.purchaseItem.create({
+        data: {
+          purchaseId: purchase.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          purchasePrice: item.purchasePrice,
+        },
+      });
+
+      await tx.produit.update({
+        where: {
+          id: item.productId,
+        },
+        data: {
+          stock: {
+            increment: item.quantity,
+          },
+        },
+      });
+    }
+
+    return purchase;
+  });
+}
 
   findAll() {
     return `This action returns all purchase`;
