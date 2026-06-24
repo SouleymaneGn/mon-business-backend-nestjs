@@ -21,9 +21,35 @@ export class SuppliersService {
     
    }
 
-  findAll() {
-   return this.prismaService.supplier.findMany()
-  }
+ async findAll() {
+  const suppliers = await this.prismaService.supplier.findMany({
+    include: {
+      purchases: true,
+    },
+  });
+
+  return suppliers.map((supplier) => {
+    const totalPurchases = supplier.purchases.reduce(
+      (sum, purchase) => sum + purchase.totalAmount,
+      0,
+    );
+
+    const totalPaid = supplier.purchases.reduce(
+      (sum, purchase) => sum + purchase.paidAmount,
+      0,
+    );
+
+    return {
+      id: supplier.id,
+      name: supplier.name,
+      phone: supplier.phone,
+      totalPurchases,
+      totalPaid,
+      balance: totalPurchases - totalPaid,
+      purchaseCount: supplier.purchases.length,
+    };
+  });
+}
 
   findOne(id: number) {
     return `This action returns a #${id} supplier`;

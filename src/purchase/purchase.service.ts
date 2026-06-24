@@ -61,9 +61,28 @@ async create(dto: CreatePurchaseDto) {
   });
 }
 
-  findAll() {
-    return `This action returns all purchase`;
-  }
+async findAll() {
+  const purchases = await this.prisma.purchase.findMany({
+    include: {
+      supplier: true,
+      items: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return purchases.map((purchase) => ({
+    id: purchase.id,
+    supplierName: purchase.supplier.name,
+    totalAmount: purchase.totalAmount,
+    paidAmount: purchase.paidAmount,
+    balance: purchase.totalAmount - purchase.paidAmount,
+    itemCount: purchase.items.length,
+    status: purchase.status,
+    createdAt: purchase.createdAt,
+  }));
+}
 
   findOne(id: number) {
     return `This action returns a #${id} purchase`;
