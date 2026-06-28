@@ -166,9 +166,8 @@ model PurchaseItem {
 }
 model Account {
   id        String   @id @default(uuid())
-  name      String   // Caisse, Orange Money, Banque
+  name      String  @unique  // Caisse, Orange Money, Banque
   balance   Float    @default(0)
-
   transactions transaction[]
 }
 
