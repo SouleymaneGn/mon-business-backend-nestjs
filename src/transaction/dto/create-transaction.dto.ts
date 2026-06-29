@@ -11,6 +11,8 @@ export class CreateTransactionDto {
       @ApiProperty()
     clientId!: string
       @ApiProperty()  
+    accountId !: string
+      @ApiProperty()  
  
     amount!: number
       @ApiProperty()

@@ -9,7 +9,7 @@ import { TransactionType } from '@prisma/client';
 export class TransactionService {
   constructor(private readonly prismaService: PrismaService){}
 async create(dto: CreateTransactionDto) {
-  const { clientId, type, amount } = dto;
+  const { clientId, type, accountId, amount } = dto;
 
   // 1. Vérifier client
   const client = await this.prismaService.customer.findUnique({
@@ -23,9 +23,20 @@ async create(dto: CreateTransactionDto) {
   // 2. Calcul solde AVANT création
   let newSolde = client.solde;
 
+  // Vérifier le compte
+  const account = await this.prismaService.account.findUnique({
+    where: { id: accountId },
+  });
+
+  if (!account) {
+    throw new BadRequestException('Compte introuvable');
+  }
+
+
   switch (type) {
     case 'DEPOT':
       newSolde += amount;
+      
       break;
 
     case 'RETRAIT':
@@ -47,9 +58,39 @@ async create(dto: CreateTransactionDto) {
       data: {
         clientId,
         type,
+        accountId,
         amount,
       },
     });
+
+    // Mettre à jour le solde du compte
+    switch (type) {
+      case 'DEPOT':
+        await tx.account.update({
+          where: { id: accountId },
+          data: {
+            balance: {
+              increment: amount,
+            },
+          },
+        });
+        break;
+
+      case 'RETRAIT':
+      case 'ACHAT':
+        await tx.account.update({
+          where: { id: accountId },
+          data: {
+            balance: {
+              decrement: amount,
+            },
+          },
+        });
+        break;
+
+      default:
+        throw new BadRequestException('Type de transaction invalide');
+      }
 
     await tx.customer.update({
       where: { id: clientId },
