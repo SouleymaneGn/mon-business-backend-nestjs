@@ -15,7 +15,10 @@ export class CustomerService {
       data : customer
     } 
     } catch (error) {
-          throw new InternalServerErrorException('Erreur lors de la création du client');
+          throw new InternalServerErrorException({
+            message:"Erreur lors de la création du client",
+            error:error
+          });
 
     }
    
@@ -28,11 +31,10 @@ export class CustomerService {
     } catch (error) {
           console.log(error); // IMPORTANT
 
-     return {
-    message: 'DEBUG',
-    error: error?.message,
-    stack: error?.stack,
-  };
+      throw new InternalServerErrorException({
+        message : "Erreur lors de la recuperation des clients",
+        error:error
+      });
    
     }
   }
