@@ -1,8 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
-import { PrismaService } from 'src/prisma.service';
-
+import { PrismaService } from '../prisma.service';
 @Injectable()
 export class SuppliersService {
    constructor(private readonly prismaService : PrismaService){}
