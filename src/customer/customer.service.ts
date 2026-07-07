@@ -28,7 +28,11 @@ export class CustomerService {
     } catch (error) {
           console.log(error); // IMPORTANT
 
-      throw new InternalServerErrorException('Erreur lors de la recuperation des clients');
+     return {
+    message: 'DEBUG',
+    error: error?.message,
+    stack: error?.stack,
+  };
    
     }
   }
